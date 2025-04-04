@@ -1,0 +1,77 @@
+body {
+  margin: 0;
+  padding: 0;
+  font-family: 'Comic Sans MS', cursive, sans-serif;
+  background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+  color: #fff;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  overflow: hidden;
+}
+
+.container {
+  text-align: center;
+}
+
+.sign {
+  background: rgba(0, 0, 0, 0.7);
+  padding: 40px;
+  border-radius: 15px;
+  box-shadow: 0 0 20px limegreen;
+  animation: floaty 2s ease-in-out infinite;
+}
+
+h1 {
+  font-size: 2.5em;
+  color: limegreen;
+}
+
+p {
+  font-size: 1.2em;
+}
+
+.loader {
+  margin: 20px auto;
+  border: 8px solid #333;
+  border-top: 8px solid limegreen;
+  border-radius: 50%;
+  width: 60px;
+  height: 60px;
+  animation: spin 1s linear infinite;
+}
+
+button {
+  margin-top: 20px;
+  padding: 10px 20px;
+  font-size: 1em;
+  background: limegreen;
+  border: none;
+  border-radius: 10px;
+  color: #000;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+button:hover {
+  transform: scale(1.1);
+  background: #00ff00;
+}
+
+.message {
+  margin-top: 30px;
+  font-style: italic;
+  font-size: 1em;
+  color: #aaa;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+@keyframes floaty {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}

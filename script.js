@@ -1,9 +1,10 @@
 const messages = [
-  "Hold on, we're adding cool stuff!",
-  "Unblocking the fun...",
-  "Almost ready to play!",
-  "This page is under construction,.",
-  "Expected release date 4-7-25."
+  "Just patching the firewall...",
+  "Downloading more RAM...",
+  "Polishing the buttons...",
+  "Checking for viruses (none found)",
+  "Unblocking the unblocked...",
+  "Rendering more pixels...",
 ];
 
 document.getElementById("clicky").addEventListener("click", () => {

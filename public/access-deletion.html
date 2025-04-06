@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>zri.info - Admin Access Deletion</title>
+    <style>
+        body { margin: 0; padding: 0; background: linear-gradient(to bottom, #0a1c18, #1a3c34); font-family: 'Frutiger', 'Verdana', sans-serif; color: #fff; overflow-x: hidden; position: relative; }
+        body::before { content: ''; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(circle, rgba(0, 255, 0, 0.1), rgba(255, 0, 0, 0.05)); opacity: 0.4; animation: cosmicPulse 15s infinite; z-index: -1; }
+        @keyframes cosmicPulse { 0% { transform: scale(1); opacity: 0.4; } 50% { transform: scale(1.2); opacity: 0.6; } 100% { transform: scale(1); opacity: 0.4; } }
+        @keyframes neonGlow { 0% { text-shadow: 0 0 5px #00ff00, 0 0 10px #00ff00; } 50% { text-shadow: 0 0 10px #00ff00, 0 0 20px #00ff00; } 100% { text-shadow: 0 0 5px #00ff00, 0 0 10px #00ff00; } }
+        .container { display: flex; min-height: 100vh; }
+        .sidebar { width: 180px; background: linear-gradient(to bottom, #0a1c18, #1a3c34); padding: 15px; border-right: 2px outset #00cc00; box-shadow: 5px 0 15px rgba(0, 0, 0, 0.8); display: none; transition: transform 0.3s ease-in-out; }
+        .sidebar.visible { display: block; transform: translateX(0); }
+        .sidebar h2 { color: #00ff00; text-shadow: 0 0 8px #00ff00; font-size: 20px; margin: 0 0 15px; text-align: center; font-weight: bold; animation: neonGlow 2s infinite; }
+        .sidebar a { display: flex; align-items: center; padding: 8px; margin: 5px 0; background: linear-gradient(to right, #2e5e56, #1a3c34); border: 2px outset #00cc00; border-radius: 15px; color: #fff; text-decoration: none; box-shadow: 0 0 5px rgba(0, 255, 0, 0.5); transition: all 0.2s; font-size: 14px; position: relative; overflow: hidden; }
+        .sidebar a::before { content: ''; display: inline-block; width: 16px; height: 16px; margin-right: 8px; background: url('https://via.placeholder.com/16x16.png?text=Icon') no-repeat center; background-size: cover; transition: transform 0.3s; }
+        .sidebar a:hover { background: linear-gradient(to right, #3e7e76, #2e5e56); border: 2px inset #00cc00; transform: translateY(-2px); }
+        .sidebar a:hover::before { transform: scale(1.2); }
+        .sidebar .visitor-counter { margin-top: 20px; text-align: center; color: #00ff00; text-shadow: 0 0 5px #00ff00; font-size: 14px; animation: neonGlow 2s infinite; }
+        .sidebar .sound-toggle { margin-top: 10px; padding: 8px; background: linear-gradient(to bottom, #003300, #006600); border: 2px outset #00ff00; border-radius: 15px; color: #fff; cursor: pointer; text-align: center; box-shadow: 0 0 5px rgba(0, 255, 0, 0.5); transition: all 0.2s; font-size: 14px; }
+        .sidebar .sound-toggle:hover { background: linear-gradient(to bottom, #006600, #003300); border: 2px inset #00ff00; transform: translateY(-2px); }
+        .hub { flex: 1; max-width: 800px; margin: 20px auto; background: rgba(0, 0, 0, 0.5); border: 3px outset #00cc00; border-radius: 15px; box-shadow: 0 0 30px rgba(0, 255, 0, 0.3), inset 0 0 15px rgba(0, 0, 0, 0.8); padding: 20px; backdrop-filter: blur(8px); position: relative; overflow: hidden; }
+        .hub::after { content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%; background: radial-gradient(circle, rgba(255, 0, 0, 0.1), transparent); animation: redPulse 10s infinite; z-index: -1; }
+        @keyframes redPulse { 0% { transform: scale(0.5); opacity: 0.2; } 50% { transform: scale(1); opacity: 0.4; } 100% { transform: scale(0.5); opacity: 0.2; } }
+        .header { background: linear-gradient(to right, #0a1c18, #1a3c34); padding: 15px; border: 2px outset #00ff00; border-radius: 10px; text-align: center; box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.8), 0 0 20px rgba(0, 255, 0, 0.3); margin-bottom: 20px; position: relative; overflow: hidden; }
+        .header::before { content: ''; position: absolute; top: -100%; left: -100%; width: 300%; height: 300%; background: radial-gradient(circle, rgba(0, 255, 0, 0.2), transparent); animation: greenWave 8s infinite; z-index: -1; }
+        @keyframes greenWave { 0% { transform: translate(0, 0); } 50% { transform: translate(50%, 50%); } 100% { transform: translate(0, 0); } }
+        .header h1 { margin: 0; font-size: 32px; color: #00ff00; text-shadow: 0 0 10px #00ff00; font-weight: bold; animation: neonGlow 2s infinite; }
+        .header p { margin: 5px 0 0; font-size: 16px; color: #00cc00; text-shadow: 0 0 5px #00cc00; }
+        .content { background: rgba(0, 0, 0, 0.6); padding: 15px; border: 2px outset #00cc00; border-radius: 10px; box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.8); margin-bottom: 20px; position: relative; }
+        .content::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(45deg, transparent, rgba(0, 255, 0, 0.1), transparent); animation: scanLine 3s infinite; z-index: -1; }
+        @keyframes scanLine { 0% { transform: translateY(-100%); } 100% { transform: translateY(100%); } }
+        .content h2 { color: #00ff00; text-shadow: 0 0 5px #00ff00; margin: 0 0 10px; font-size: 24px; font-weight: bold; animation: neonGlow 2s infinite; }
+        .content p { color: #fff; line-height: 1.5; font-size: 14px; margin: 0 0 10px; }
+        .content select { padding: 10px; margin: 5px 0; border: 2px outset #00cc00; border-radius: 5px; background: rgba(0, 51, 0, 0.4); color: #00ff00; box-shadow: inset 0 0 8px rgba(0, 0, 0, 0.7); width: calc(100% - 24px); }
+        .content button { padding: 10px 20px; background: linear-gradient(to bottom, #ff0000, #660000); border: 2px outset #ff3333; border-radius: 15px; color: #fff; cursor: pointer; box-shadow: 0 0 10px rgba(255, 0, 0, 0.5); transition: all 0.2s; font-size: 16px; position: relative; overflow: hidden; }
+        .content button:hover { background: linear-gradient(to bottom, #660000, #ff0000); border: 2px inset #ff3333; transform: translateY(-2px); box-shadow: 0 0 15px rgba(255, 0, 0, 0.7); }
+        .content button::after { content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%; background: radial-gradient(circle, rgba(255, 0, 0, 0.3), transparent); animation: buttonGlow 2s infinite; z-index: -1; }
+        @keyframes buttonGlow { 0% { transform: scale(0); opacity: 0.5; } 50% { transform: scale(1); opacity: 0.8; } 100% { transform: scale(0); opacity: 0.5; } }
+        #admin-content { display: none; }
+        #access-denied { display: none; }
+        #confirmation { display: none; background: rgba(0, 0, 0, 0.7); padding: 15px; border: 2px outset #ff3333; border-radius: 10px; margin-top: 20px; animation: fadeIn 0.5s; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        #confirmation p { margin: 0 0 10px; }
+        #confirmation button { margin-right: 10px; }
+        .footer { text-align: center; padding: 10px; background: linear-gradient(to right, #0a1c18, #1a3c34); border: 2px outset #00ff00; border-radius: 10px; box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.8); margin-top: 20px; position: relative; }
+        .footer::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(circle, rgba(0, 255, 0, 0.1), transparent); animation: footerGlow 5s infinite; z-index: -1; }
+        @keyframes footerGlow { 0% { opacity: 0.2; } 50% { opacity: 0.4; } 100% { opacity: 0.2; } }
+        .footer p { margin: 0; font-size: 12px; color: #00cc00; text-shadow: 0 0 5px #00cc00; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="sidebar" id="sidebar">
+            <h2>zri.info</h2>
+            <a href="/index.html">Home</a>
+            <a href="/introduction.html">Introduction</a>
+            <a href="/games.html">Games</a>
+            <a href="/resources.html">Resources</a>
+            <a href="/history.html">History</a>
+            <a href="/music.html">Music</a>
+            <a href="/videos.html">Videos</a>
+            <a href="/contact.html">Contact</a>
+            <a href="/access-deletion.html">Delete Access</a>
+            <div class="visitor-counter">Visitors: 1,965,576</div>
+            <div class="sound-toggle">SOUND FX ON</div>
+        </div>
+        <div class="hub">
+            <div class="header">
+                <h1>zri.info</h1>
+                <p>Admin - Delete User Access</p>
+            </div>
+            <div class="content" id="access-denied">
+                <h2>Access Denied</h2>
+                <p>You do not have permission to access this page. This page is restricted to administrators only.</p>
+            </div>
+            <div class="content" id="admin-content">
+                <h2>Delete User Access</h2>
+                <p>Select a user to revoke their access to zri.info. This will remove their token and set their status to "denied".</p>
+                <select id="user-select">
+                    <option value="">Select a user...</option>
+                </select>
+                <button id="delete-btn" onclick="showConfirmation()">Delete Access</button>
+                <div id="confirmation">
+                    <p>Are you sure you want to delete access for <span id="selected-user"></span>? This action cannot be undone.</p>
+                    <button id="confirm-delete-btn" onclick="deleteAccess()">Yes, Delete</button>
+                    <button onclick="hideConfirmation()">Cancel</button>
+                </div>
+            </div>
+            <div class="footer">
+                <p>© 2025 zri.info - Powered by Infinite Realms</p>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js';
+        import { getDatabase, ref, get, set, remove, push } from 'https://www.gstatic.com/firebasejs/10.12.5/firebase-database.js';
+        import { getAuth, signInWithCustomToken, signOut } from 'https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js';
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyCKHYwiEY7E2BKWR4BEtEx6Mw4Gb1V-u48",
+            authDomain: "zri-info-tokens.firebaseapp.com",
+            databaseURL: "https://zri-info-tokens-default-rtdb.firebaseio.com",
+            projectId: "zri-info-tokens",
+            storageBucket: "zri-info-tokens.firebasestorage.app",
+            messagingSenderId: "343328222138",
+            appId: "1:343328222138:web:c64841841f69665d968b83",
+            measurementId: "G-6LNN3LQK27"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+        const auth = getAuth(app);
+        const DISCORD_WEBHOOK_URL = "https://discord.com/api/webhooks/1357890150075600936/9EQ0xmN5iXXuUWHvdtukypkmbfPtYhahOQ_4PYwjdbaqw9FTMj6Ty0DvsWScdbywfG0y";
+
+        async function fetchCustomToken(username) {
+            try {
+                const response = await fetch('/api/generateCustomToken', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username })
+                });
+                const data = await response.json();
+                if (!response.ok) {
+                    throw new Error(data.error || 'Failed to fetch custom token');
+                }
+                return data.customToken;
+            } catch (error) {
+                throw new Error(`Error fetching custom token: ${error.message}`);
+            }
+        }
+
+        async function sendDiscordWebhook(username, action, status, errorMessage = null) {
+            const ipAddress = await fetch('https://api.ipify.org?format=json')
+                .then(response => response.json())
+                .then(data => data.ip)
+                .catch(() => "Unknown");
+
+            const embed = {
+                title: status === "success" ? "🚫 Access Revoked" : "❌ Revoke Failed",
+                color: status === "success" ? 16711680 : 15548997,
+                fields: [
+                    { name: "Admin", value: auth.currentUser.uid, inline: true },
+                    { name: "Target User", value: username, inline: true },
+                    { name: "Action", value: action, inline: true },
+                    { name: "IP Address", value: ipAddress, inline: true },
+                    { name: "Status", value: status, inline: true }
+                ],
+                timestamp: new Date().toISOString(),
+                footer: { text: "zri.info Access Control" }
+            };
+
+            if (errorMessage) {
+                embed.fields.push({ name: "Error", value: errorMessage, inline: false });
+            }
+
+            try {
+                const response = await fetch(DISCORD_WEBHOOK_URL, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ embeds: [embed] })
+                });
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    throw new Error(`Webhook failed with status ${response.status}: ${errorText}`);
+                }
+                return true;
+            } catch (error) {
+                console.error("Error sending Discord webhook:", error);
+                alert(`Failed to send notification to admin: ${error.message}`);
+                return false;
+            }
+        }
+
+        const storedAccess = localStorage.getItem("zriAccess");
+        const adminContent = document.getElementById("admin-content");
+        const accessDenied = document.getElementById("access-denied");
+        const sidebar = document.getElementById("sidebar");
+        const userSelect = document.getElementById("user-select");
+        const confirmation = document.getElementById("confirmation");
+        const selectedUserSpan = document.getElementById("selected-user");
+        const deleteBtn = document.getElementById("delete-btn");
+        const confirmDeleteBtn = document.getElementById("confirm-delete-btn");
+
+        let selectedUsername = "";
+
+        if (storedAccess) {
+            const { username, token } = JSON.parse(storedAccess);
+            console.log("Checking stored access for username:", username);
+            fetchCustomToken(username).then(async (customToken) => {
+                console.log("Custom token received:", customToken);
+                await signInWithCustomToken(auth, customToken);
+                console.log("Custom sign-in successful for token validation");
+                await new Promise(resolve => setTimeout(resolve, 2000));
+                const tokenRef = ref(db, 'tokens/' + username);
+                try {
+                    const snapshot = await get(tokenRef);
+                    const tokenData = snapshot.val();
+                    if (tokenData && tokenData.token === token && tokenData.reusable && tokenData.username === username) {
+                        console.log("Stored token is valid, checking admin status");
+                        const userRef = ref(db, 'users/' + username);
+                        const userSnapshot = await get(userRef);
+                        const userData = userSnapshot.val();
+                        if (userData && userData.role === "admin") {
+                            console.log("User is an admin, showing admin content");
+                            adminContent.style.display = "block";
+                            accessDenied.style.display = "none";
+                            sidebar.classList.add("visible");
+                            await loadUsers();
+                        } else {
+                            console.log("User is not an admin, showing access denied");
+                            adminContent.style.display = "none";
+                            accessDenied.style.display = "block";
+                            sidebar.classList.remove("visible");
+                        }
+                    } else {
+                        console.log("Stored token is invalid, removing access");
+                        localStorage.removeItem("zriAccess");
+                        adminContent.style.display = "none";
+                        accessDenied.style.display = "block";
+                        sidebar.classList.remove("visible");
+                        alert("Your session is invalid or has been revoked. Please log in again.");
+                    }
+                } catch (error) {
+                    console.error("Error checking stored token or user role:", error);
+                    localStorage.removeItem("zriAccess");
+                    adminContent.style.display = "none";
+                    accessDenied.style.display = "block";
+                    sidebar.classList.remove("visible");
+                    alert("Error validating session: " + error.message);
+                }
+            }).catch((error) => {
+                console.error("Error fetching custom token or signing in:", error);
+                localStorage.removeItem("zriAccess");
+                adminContent.style.display = "none";
+                accessDenied.style.display = "block";
+                sidebar.classList.remove("visible");
+                alert("Error validating session: " + error.message);
+            }).finally(async () => {
+                await signOut(auth);
+            });
+        } else {
+            adminContent.style.display = "none";
+            accessDenied.style.display = "block";
+            sidebar.classList.remove("visible");
+        }
+
+        async function loadUsers() {
+            try {
+                console.log("Generating custom token for admin to load users:", auth.currentUser?.uid || JSON.parse(storedAccess).username);
+                const customToken = await fetchCustomToken(auth.currentUser?.uid || JSON.parse(storedAccess).username);
+                await signInWithCustomToken(auth, customToken);
+                console.log("Custom sign-in successful for loading users");
+
+                const usersRef = ref(db, 'users');
+                const snapshot = await get(usersRef);
+                const users = snapshot.val();
+                if (users) {
+                    console.log("Users loaded:", Object.keys(users));
+                    for (const username in users) {
+                        if (users[username].role !== "admin") { // Exclude admins from the list
+                            const option = document.createElement("option");
+                            option.value = username;
+                            option.textContent = username;
+                            userSelect.appendChild(option);
+                        }
+                    }
+                } else {
+                    console.log("No users found in the database");
+                    const option = document.createElement("option");
+                    option.value = "";
+                    option.textContent = "No users available";
+                    userSelect.appendChild(option);
+                    userSelect.disabled = true;
+                    deleteBtn.disabled = true;
+                }
+            } catch (error) {
+                console.error("Error loading users:", error);
+                alert("Error loading users: " + error.message);
+            } finally {
+                await signOut(auth);
+            }
+        }
+
+        window.showConfirmation = function() {
+            selectedUsername = userSelect.value;
+            if (!selectedUsername) {
+                alert("Please select a user to delete access for.");
+                return;
+            }
+            selectedUserSpan.textContent = selectedUsername;
+            confirmation.style.display = "block";
+            deleteBtn.disabled = true;
+            userSelect.disabled = true;
+        };
+
+        window.hideConfirmation = function() {
+            confirmation.style.display = "none";
+            deleteBtn.disabled = false;
+            userSelect.disabled = false;
+            selectedUsername = "";
+        };
+
+        window.deleteAccess = async function() {
+            if (!selectedUsername) {
+                alert("No user selected for deletion.");
+                return;
+            }
+
+            confirmDeleteBtn.disabled = true;
+            confirmDeleteBtn.textContent = "Processing...";
+
+            try {
+                console.log("Generating custom token for admin to delete access:", auth.currentUser?.uid || JSON.parse(storedAccess).username);
+                const customToken = await fetchCustomToken(auth.currentUser?.uid || JSON.parse(storedAccess).username);
+                await signInWithCustomToken(auth, customToken);
+                console.log("Custom sign-in successful for deleting access");
+
+                // Delete the user's token
+                const tokenRef = ref(db, 'tokens/' + selectedUsername);
+                await remove(tokenRef);
+                console.log("Token deleted for user:", selectedUsername);
+
+                // Update the user's status to "denied"
+                const userRef = ref(db, 'users/' + selectedUsername);
+                await set(userRef, {
+                    ...((await get(userRef)).val() || {}),
+                    status: "denied"
+                });
+                console.log("User status updated to denied for:", selectedUsername);
+
+                // Log the action
+                await push(ref(db, 'logs'), {
+                    admin: auth.currentUser.uid,
+                    action: "delete_access",
+                    target_user: selectedUsername,
+                    timestamp: new Date().toISOString()
+                });
+                console.log("Action logged");
+
+                await sendDiscordWebhook(selectedUsername, "delete_access", "success");
+                alert(`Access for ${selectedUsername} has been successfully revoked.`);
+
+                // Refresh the user list
+                userSelect.innerHTML = '<option value="">Select a user...</option>';
+                await loadUsers();
+            } catch (error) {
+                console.error("Error deleting access:", error);
+                await sendDiscordWebhook(selectedUsername, "delete_access", "failed", error.message);
+                alert("Error deleting access: " + error.message);
+            } finally {
+                await signOut(auth);
+                confirmDeleteBtn.disabled = false;
+                confirmDeleteBtn.textContent = "Yes, Delete";
+                confirmation.style.display = "none";
+                deleteBtn.disabled = false;
+                userSelect.disabled = false;
+                selectedUsername = "";
+            }
+        };
+    </script>
+    <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'92bf0ae1be01678a',t:'MTc0MzkxODk5MS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script>
+</body>
+</html>

@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>zri.info - Introduction</title>
+    <style>
+        /* [Your existing CSS remains unchanged] */
+        body { margin: 0; padding: 0; background: linear-gradient(to bottom, #0a1c18, #1a3c34); font-family: 'Frutiger', 'Verdana', sans-serif; color: #fff; overflow-x: hidden; position: relative; }
+        body::before { content: ''; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(circle, rgba(0, 255, 0, 0.1), rgba(255, 0, 0, 0.05)); opacity: 0.4; animation: cosmicPulse 15s infinite; z-index: -1; }
+        @keyframes cosmicPulse { 0% { transform: scale(1); opacity: 0.4; } 50% { transform: scale(1.2); opacity: 0.6; } 100% { transform: scale(1); opacity: 0.4; } }
+        /* ... (rest of your CSS) ... */
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="sidebar" id="sidebar">
+            <h2>zri.info</h2>
+            <a href="/index.html">Home</a>
+            <a href="/introduction.html">Introduction</a>
+            <a href="/games.html">Games</a>
+            <a href="/resources.html">Resources</a>
+            <a href="/history.html">History</a>
+            <a href="/music.html">Music</a>
+            <a href="/videos.html">Videos</a>
+            <a href="/contact.html">Contact</a>
+            <a href="/access-deletion.html">Delete Access</a>
+            <div class="visitor-counter">Visitors: 1,965,576</div>
+            <div class="sound-toggle">SOUND FX ON</div>
+        </div>
+        <div class="hub">
+            <div class="header">
+                <h1>zri.info</h1>
+                <p>Explore the Cosmic Network</p>
+            </div>
+            <div class="banner">
+                <h2>Introduction to zri.info</h2>
+            </div>
+            <div class="content" id="locked-content">
+                <h2>Welcome to zri.info</h2>
+                <p>zri.info is a cosmic gateway to a vast network of gaming resources, community hubs, and infinite possibilities. This site serves as a portal for gamers to connect, explore, and immerse themselves in a universe of digital adventures. Navigate through our sections to discover more!</p>
+                <p>Check out our <a href="/games.html">Games</a> section for the latest titles, <a href="/resources.html">Resources</a> for tools and guides, and <a href="/contact.html">Contact</a> to join our community.</p>
+            </div>
+            <div class="footer">
+                <p>© 2025 zri.info - Powered by Infinite Realms</p>
+            </div>
+        </div>
+    </div>
+    <div id="lock-screen">
+        <div class="lock-screen-content">
+            <h2>Access Restricted</h2>
+            <input type="text" id="username-input" placeholder="Username">
+            <input type="password" id="password-input" placeholder="Password">
+            <button id="lock-screen-login-btn">Login</button>
+            <p>Enter your credentials to unlock the cosmic gateway.</p>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js';
+        import { getDatabase, ref, get, set, push } from 'https://www.gstatic.com/firebasejs/10.12.5/firebase-database.js';
+        import { getAuth, signInWithCustomToken, signOut } from 'https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js';
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyCKHYwiEY7E2BKWR4BEtEx6Mw4Gb1V-u48",
+            authDomain: "zri-info-tokens.firebaseapp.com",
+            databaseURL: "https://zri-info-tokens-default-rtdb.firebaseio.com",
+            projectId: "zri-info-tokens",
+            storageBucket: "zri-info-tokens.firebasestorage.app",
+            messagingSenderId: "343328222138",
+            appId: "1:343328222138:web:c64841841f69665d968b83",
+            measurementId: "G-6LNN3LQK27"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+        const auth = getAuth(app);
+        const lockScreenLoginBtn = document.getElementById("lock-screen-login-btn");
+
+        function simpleHash(str) {
+            let hash = 0;
+            for (let i = 0; i < str.length; i++) {
+                const char = str.charCodeAt(i);
+                hash = ((hash << 5) - hash) + char;
+                hash = hash & hash;
+            }
+            return Math.abs(hash).toString(16).toUpperCase().padStart(8, '0');
+        }
+
+        function generateToken(username, password) {
+            return `ZRI-TOKEN-${simpleHash(username + password)}`;
+        }
+
+        async function fetchCustomToken(username) {
+            const response = await fetch('/api/generateCustomToken', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username })
+            });
+            const data = await response.json();
+            if (!response.ok) {
+                throw new Error(data.error || 'Failed to fetch custom token');
+            }
+            return data.customToken;
+        }
+
+        const storedAccess = localStorage.getItem("zriAccess");
+        const lockedContent = document.getElementById("locked-content");
+        const sidebar = document.getElementById("sidebar");
+        const lockScreen = document.getElementById("lock-screen");
+
+        if (storedAccess) {
+            const { username, token } = JSON.parse(storedAccess);
+            console.log("Checking stored access for username:", username);
+            fetchCustomToken(username).then(async (customToken) => {
+                console.log("Custom token fetched:", customToken);
+                await signInWithCustomToken(auth, customToken);
+                console.log("Custom sign-in successful");
+                await new Promise(resolve => setTimeout(resolve, 2000));
+                const tokenRef = ref(db, 'tokens/' + username);
+                try {
+                    const snapshot = await get(tokenRef);
+                    const tokenData = snapshot.val();
+                    if (tokenData && tokenData.token === token && tokenData.reusable && tokenData.username === username) {
+                        console.log("Stored token is valid, showing content");
+                        lockedContent.style.display = "block";
+                        sidebar.classList.add("visible");
+                        lockScreen.style.display = "none";
+                    } else {
+                        console.log("Stored token is invalid, removing access");
+                        localStorage.removeItem("zriAccess");
+                        lockedContent.style.display = "none";
+                        sidebar.classList.remove("visible");
+                        lockScreen.style.display = "flex";
+                    }
+                } catch (error) {
+                    console.error("Error checking stored token:", error);
+                    localStorage.removeItem("zriAccess");
+                    lockScreen.style.display = "flex";
+                } finally {
+                    await signOut(auth);
+                }
+            }).catch((error) => {
+                console.error("Error during custom sign-in:", error);
+                localStorage.removeItem("zriAccess");
+                lockScreen.style.display = "flex";
+            });
+        } else {
+            lockScreen.style.display = "flex";
+        }
+
+        async function loginFromLockScreen() {
+            const username = document.getElementById("username-input").value.trim();
+            const password = document.getElementById("password-input").value;
+
+            if (!username || !password) {
+                alert("Username and password are required!");
+                return;
+            }
+
+            lockScreenLoginBtn.disabled = true;
+            lockScreenLoginBtn.textContent = "Processing...";
+
+            try {
+                const customToken = await fetchCustomToken(username);
+                console.log("Custom token fetched:", customToken);
+                await signInWithCustomToken(auth, customToken);
+                console.log("Custom sign-in successful");
+                await new Promise(resolve => setTimeout(resolve, 2000));
+                console.log("Auth state propagated, user:", auth.currentUser);
+
+                const userRef = ref(db, 'users/' + username);
+                const snapshot = await get(userRef);
+                if (!snapshot.exists()) {
+                    alert("User not found. Please register on the login page.");
+                    return;
+                }
+
+                const userData = snapshot.val();
+                if (userData.status !== "approved" || userData.password !== password) {
+                    alert("Invalid credentials or access not approved.");
+                    return;
+                }
+
+                const token = generateToken(username, password);
+                const tokenRef = ref(db, 'tokens/' + username);
+                await set(tokenRef, {
+                    token: token,
+                    username: username,
+                    reusable: true,
+                    created_at: new Date().toISOString()
+                });
+
+                await push(ref(db, 'logs'), {
+                    username: username,
+                    token: token,
+                    timestamp: new Date().toISOString()
+                });
+
+                localStorage.setItem("zriAccess", JSON.stringify({ username, token }));
+                lockedContent.style.display = "block";
+                sidebar.classList.add("visible");
+                lockScreen.style.display = "none";
+            } catch (error) {
+                console.error("Error logging in:", error);
+                alert("Error logging in: " + error.message);
+            } finally {
+                await signOut(auth);
+                lockScreenLoginBtn.disabled = false;
+                lockScreenLoginBtn.textContent = "Login";
+            }
+        }
+
+        document.getElementById("lock-screen-login-btn").onclick = loginFromLockScreen;
+    </script>
+    <!-- [Your existing Cloudflare scripts remain unchanged] -->
+    <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'92bf0ae1be01678a',t:'MTc0MzkxODk5MS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script>
+    <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'92bf31d19c61bfd4',t:'MTc0MzkyMDU4Ni4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script>
+</body>
+</html>

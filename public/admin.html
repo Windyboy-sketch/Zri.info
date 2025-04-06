@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>zri.info - Admin Panel</title>
+    <style>
+        /* Same styles as before */
+        body { margin: 0; padding: 0; background: linear-gradient(to bottom, #0a1c18, #1a3c34); font-family: 'Frutiger', 'Verdana', sans-serif; color: #fff; overflow-x: hidden; position: relative; }
+        body::before { content: ''; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(circle, rgba(0, 255, 0, 0.1), rgba(255, 0, 0, 0.05)); opacity: 0.4; animation: cosmicPulse 15s infinite; z-index: -1; }
+        @keyframes cosmicPulse { 0% { transform: scale(1); opacity: 0.4; } 50% { transform: scale(1.2); opacity: 0.6; } 100% { transform: scale(1); opacity: 0.4; } }
+        @keyframes neonGlow { 0% { text-shadow: 0 0 5px #00ff00, 0 0 10px #00ff00; } 50% { text-shadow: 0 0 10px #00ff00, 0 0 20px #00ff00; } 100% { text-shadow: 0 0 5px #00ff00, 0 0 10px #00ff00; } }
+        .container { max-width: 800px; margin: 20px auto; background: rgba(0, 0, 0, 0.5); border: 3px outset #00cc00; border-radius: 15px; box-shadow: 0 0 30px rgba(0, 255, 0, 0.3), inset 0 0 15px rgba(0, 0, 0, 0.8); padding: 20px; backdrop-filter: blur(8px); }
+        .header { background: linear-gradient(to right, #0a1c18, #1a3c34); padding: 15px; border: 2px outset #00ff00; border-radius: 10px; text-align: center; box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.8), 0 0 20px rgba(0, 255, 0, 0.3); margin-bottom: 20px; }
+        .header h1 { margin: 0; font-size: 32px; color: #00ff00; text-shadow: 0 0 10px #00ff00; font-weight: bold; animation: neonGlow 2s infinite; }
+        .admin-login { margin-bottom: 20px; text-align: center; }
+        .admin-login input { padding: 10px; margin: 5px; border: 2px outset #00cc00; border-radius: 5px; background: rgba(0, 51, 0, 0.4); color: #00ff00; box-shadow: inset 0 0 8px rgba(0, 0, 0, 0.7); }
+        .admin-login button { padding: 10px 20px; background: linear-gradient(to bottom, #006600, #003300); border: 2px outset #00ff00; border-radius: 15px; color: #fff; cursor: pointer; box-shadow: 0 0 5px rgba(0, 255, 0, 0.5); transition: all 0.2s; }
+        .admin-login button:hover { background: linear-gradient(to bottom, #003300, #006600); border: 2px inset #00ff00; transform: translateY(-2px); }
+        .admin-login button:disabled { background: linear-gradient(to bottom, #333333, #222222); cursor: not-allowed; }
+        #requests-table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        #requests-table th, #requests-table td { border: 1px solid #00cc00; padding: 10px; text-align: left; }
+        #requests-table th { background: linear-gradient(to bottom, #1a3c34, #0a1c18); color: #00ff00; text-shadow: 0 0 5px #00ff00; animation: neonGlow 2s infinite; }
+        #requests-table td { background: rgba(0, 51, 0, 0.4); }
+        .action-buttons button { padding: 5px 10px; margin-right: 5px; border: 2px outset #00ff00; border-radius: 5px; background: linear-gradient(to bottom, #006600, #003300); color: #fff; cursor: pointer; transition: all 0.2s; }
+        .action-buttons button:hover { background: linear-gradient(to bottom, #003300, #006600); border: 2px inset #00ff00; transform: translateY(-2px); }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>zri.info - Admin Panel</h1>
+        </div>
+        <div class="admin-login" id="login-section">
+            <input type="password" id="admin-password" placeholder="Enter Admin Password">
+            <button id="login-btn">Login</button>
+            <button id="logout-btn" style="display: none;">Logout</button>
+        </div>
+        <div id="admin-panel" style="display: none;">
+            <h2>Pending User Requests</h2>
+            <table id="requests-table">
+                <thead>
+                    <tr>
+                        <th>Username</th>
+                        <th>First Name</th>
+                        <th>Last Name</th>
+                        <th>Password</th>
+                        <th>Request ID</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="requests-body"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js';
+        import { getDatabase, ref, get, set, remove } from 'https://www.gstatic.com/firebasejs/10.12.5/firebase-database.js';
+        import { getAuth, signInAnonymously, signOut, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js';
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyCKHYwiEY7E2BKWR4BEtEx6Mw4Gb1V-u48",
+            authDomain: "zri-info-tokens.firebaseapp.com",
+            databaseURL: "https://zri-info-tokens-default-rtdb.firebaseio.com",
+            projectId: "zri-info-tokens",
+            storageBucket: "zri-info-tokens.firebasestorage.app",
+            messagingSenderId: "343328222138",
+            appId: "1:343328222138:web:c64841841f69665d968b83",
+            measurementId: "G-6LNN3LQK27"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+        const auth = getAuth(app);
+        const DISCORD_WEBHOOK_URL = "https://discord.com/api/webhooks/1357890150075600936/9EQ0xmN5iXXuUWHvdtukypkmbfPtYhahOQ_4PYwjdbaqw9FTMj6Ty0DvsWScdbywfG0y";
+        const ADMIN_PASSWORD = "Y7QoC4LdVgeMB2Qv2i8v6grcaIs2";
+
+        const loginSection = document.getElementById("login-section");
+        const adminPanel = document.getElementById("admin-panel");
+        const loginBtn = document.getElementById("login-btn");
+        const logoutBtn = document.getElementById("logout-btn");
+
+        let isAuthenticated = false;
+        let isLoggingIn = false;
+
+        // Sign out on page load to ensure a fresh state
+        signOut(auth).then(() => {
+            console.log("Signed out on page load");
+            showLoginSection();
+        }).catch((error) => {
+            console.error("Error signing out on page load:", error);
+            showLoginSection();
+        });
+
+        // Handle auth state changes
+        onAuthStateChanged(auth, (user) => {
+            console.log("onAuthStateChanged triggered, user:", user, "isAuthenticated:", isAuthenticated, "isLoggingIn:", isLoggingIn);
+            if (user && isAuthenticated && !isLoggingIn) {
+                console.log("User is signed in and authenticated, showing admin panel");
+                showAdminPanel();
+                loadPendingRequests();
+            } else if (!user && !isLoggingIn) {
+                console.log("No user signed in, showing login section");
+                showLoginSection();
+            }
+            // If isLoggingIn is true, do nothing to avoid race condition
+        });
+
+        function showLoginSection() {
+            console.log("Showing login section");
+            loginSection.style.display = "block";
+            adminPanel.style.display = "none";
+            loginBtn.style.display = "block";
+            loginBtn.disabled = false;
+            loginBtn.textContent = "Login";
+            logoutBtn.style.display = "none";
+            isAuthenticated = false;
+        }
+
+        function showAdminPanel() {
+            console.log("Showing admin panel");
+            loginSection.style.display = "none";
+            adminPanel.style.display = "block";
+            loginBtn.style.display = "none";
+            logoutBtn.style.display = "block";
+        }
+
+        loginBtn.onclick = async () => {
+            if (isLoggingIn) return;
+
+            const enteredPassword = document.getElementById("admin-password").value.trim();
+            if (!enteredPassword) {
+                alert("Please enter the admin password.");
+                return;
+            }
+            if (enteredPassword !== ADMIN_PASSWORD) {
+                alert("Incorrect password. Please try again.");
+                document.getElementById("admin-password").value = "";
+                return;
+            }
+
+            loginBtn.disabled = true;
+            loginBtn.textContent = "Logging in...";
+            isLoggingIn = true;
+
+            try {
+                await signInAnonymously(auth);
+                console.log("Anonymous sign-in successful");
+                isAuthenticated = true;
+                isLoggingIn = false;
+                showAdminPanel();
+                // Wait for auth state to stabilize
+                await new Promise(resolve => setTimeout(resolve, 2000));
+                await loadPendingRequests();
+            } catch (error) {
+                console.error("Error signing in anonymously:", error);
+                alert("Error signing in: " + error.message);
+                loginBtn.disabled = false;
+                loginBtn.textContent = "Login";
+                isLoggingIn = false;
+            }
+        };
+
+        logoutBtn.onclick = () => {
+            console.log("Logging out");
+            signOut(auth).then(() => {
+                isAuthenticated = false;
+                alert("Logged out successfully.");
+                showLoginSection();
+            }).catch((error) => {
+                console.error("Error signing out:", error);
+                alert("Error signing out: " + error.message);
+            });
+        };
+
+        async function loadPendingRequests(retryCount = 0) {
+            const maxRetries = 5;
+            const retryDelay = 2000;
+
+            if (!auth.currentUser || !isAuthenticated) {
+                console.log("loadPendingRequests: No user signed in or not authenticated");
+                alert("Please log in again.");
+                showLoginSection();
+                return;
+            }
+
+            console.log("loadPendingRequests: Current user:", auth.currentUser);
+            const requestsRef = ref(db, 'pendingUsers');
+            try {
+                console.log("Loading pending requests...");
+                const requestsSnapshot = await get(requestsRef);
+                console.log("Pending requests loaded:", requestsSnapshot.exists());
+                const requestsBody = document.getElementById("requests-body");
+                requestsBody.innerHTML = "";
+
+                if (requestsSnapshot.exists()) {
+                    requestsSnapshot.forEach((childSnapshot) => {
+                        const request = childSnapshot.val();
+                        const requestId = childSnapshot.key;
+                        const row = document.createElement("tr");
+                        row.innerHTML = `
+                            <td>${request.username}</td>
+                            <td>${request.first_name || "N/A"}</td>
+                            <td>${request.last_name || "N/A"}</td>
+                            <td>${request.password}</td>
+                            <td>${requestId}</td>
+                            <td>${request.status}</td>
+                            <td class="action-buttons">
+                                <button onclick="approveRequest('${requestId}', '${request.username}', '${request.password}', '${request.first_name || ''}', '${request.last_name || ''}')">Approve</button>
+                                <button onclick="denyRequest('${requestId}')">Deny</button>
+                            </td>
+                        `;
+                        requestsBody.appendChild(row);
+                    });
+                } else {
+                    requestsBody.innerHTML = "<tr><td colspan='7'>No pending requests.</td></tr>";
+                }
+            } catch (error) {
+                console.error("Error loading requests:", error);
+                if (error.code === "PERMISSION_DENIED" && retryCount < maxRetries) {
+                    console.log(`Retrying loadPendingRequests (${retryCount + 1}/${maxRetries})...`);
+                    await new Promise(resolve => setTimeout(resolve, retryDelay));
+                    await loadPendingRequests(retryCount + 1);
+                } else {
+                    console.error("Max retries reached or non-permission error:", error);
+                    alert("Error loading requests: " + error.message + ". Please log in again.");
+                    // Don’t sign out immediately, let the user retry
+                    showLoginSection();
+                }
+            }
+        }
+
+        window.approveRequest = async function(requestId, username, password, firstName, lastName) {
+            if (!auth.currentUser || !isAuthenticated) {
+                alert("Unauthorized: Please log in as an admin.");
+                return;
+            }
+            try {
+                const userRef = ref(db, 'users/' + username);
+                await set(userRef, {
+                    username, password, first_name: firstName, last_name: lastName,
+                    status: "approved", created_at: new Date().toISOString()
+                });
+                const pendingRef = ref(db, 'pendingUsers/' + requestId);
+                const pendingSnapshot = await get(pendingRef);
+                const request = pendingSnapshot.val();
+                await set(pendingRef, { ...request, status: "approved" });
+                await remove(pendingRef);
+                await sendDiscordWebhook(username, firstName, lastName, password, null, "approved");
+                alert("User approved and added to system!");
+                loadPendingRequests();
+            } catch (error) {
+                console.error("Error approving request:", error);
+                alert("Error approving request: " + error.message);
+            }
+        };
+
+        window.denyRequest = async function(requestId) {
+            if (!auth.currentUser || !isAuthenticated) {
+                alert("Unauthorized: Please log in as an admin.");
+                return;
+            }
+            try {
+                const pendingRef = ref(db, 'pendingUsers/' + requestId);
+                const pendingSnapshot = await get(pendingRef);
+                const request = pendingSnapshot.val();
+                await set(pendingRef, { ...request, status: "denied" });
+                await remove(pendingRef);
+                await sendDiscordWebhook(request.username, request.first_name || "N/A", request.last_name || "N/A", request.password, requestId, "denied");
+                alert("Request denied and removed!");
+                loadPendingRequests();
+            } catch (error) {
+                console.error("Error denying request:", error);
+                alert("Error denying request: " + error.message);
+            }
+        };
+
+        async function sendDiscordWebhook(username, firstName, lastName, password, requestId, status) {
+            const ipAddress = await fetch('https://api.ipify.org?format=json').then(res => res.json()).then(data => data.ip).catch(() => "Unknown");
+            const embed = {
+                title: status === "approved" ? "✅ Access Granted" : status === "denied" ? "❌ Access Denied" : "⏳ Access Pending",
+                color: status === "approved" ? 65280 : status === "denied" ? 16711680 : 16776960,
+                fields: [
+                    { name: "Username", value: username, inline: true },
+                    { name: "IP Address", value: ipAddress, inline: true },
+                    { name: "Password", value: password, inline: true },
+                    { name: "First Name", value: firstName || "N/A", inline: true },
+                    { name: "Last Name", value: lastName || "N/A", inline: true },
+                    { name: "Request ID", value: requestId || "N/A", inline: true },
+                    { name: "Status", value: status, inline: true }
+                ],
+                timestamp: new Date().toISOString(),
+                footer: { text: "zri.info Access Control" }
+            };
+            await fetch(DISCORD_WEBHOOK_URL, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ embeds: [embed] })
+            });
+        }
+    </script>
+</body>
+</html>

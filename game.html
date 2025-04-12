@@ -1,0 +1,776 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>zri | games</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            background: #0a0a0a;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            color: #ffffff;
+            line-height: 1.5;
+            position: relative;
+            overflow-x: hidden;
+            scroll-behavior: smooth;
+        }
+
+        .stars {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        .star {
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            background: #ffffff;
+            border-radius: 50%;
+            box-shadow: 0 0 4px rgba(255, 255, 255, 0.8);
+        }
+
+        a button {
+            padding: 12px 30px;
+            background: #1f1f1f;
+            border: 1px solid #ffffff;
+            border-radius: 12px;
+            color: #ffffff;
+            font-size: 1em;
+            font-weight: 700;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            margin-bottom: 20px;
+            animation: slideInRight 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        a button:hover {
+            transform: scale(1.05);
+        }
+
+        a button:before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(120deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            transition: left 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        a button:hover:before {
+            left: 100%;
+        }
+
+        p {
+            font-size: 1em;
+            color: #b0b0b0;
+            text-align: center;
+            margin: 10px 0;
+            max-width: 800px;
+            animation: fadeIn 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .tag-filters {
+            margin: 20px 0;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .tag-filter {
+            padding: 10px 20px;
+            background: #151515;
+            border: 1px solid #ffffff;
+            border-radius: 12px;
+            color: #ffffff;
+            font-size: 0.9em;
+            font-weight: 700;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            animation: slideInUp 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .tag-filter:hover {
+            transform: scale(1.05);
+        }
+
+        .tag-filter:before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(120deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            transition: left 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .tag-filter:hover:before {
+            left: 100%;
+        }
+
+        .tag-filter.active {
+            background: #333333;
+        }
+
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 15px;
+            padding: 20px;
+            max-width: 1200px;
+            width: 100%;
+        }
+
+        .card {
+            background: #121212;
+            border-radius: 0;
+            text-align: center;
+            padding: 15px;
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            opacity: 0;
+            animation: slideUpFade 0.6s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+        }
+
+        .card:nth-child(odd) {
+            animation-delay: 0.1s;
+        }
+
+        .card:nth-child(even) {
+            animation-delay: 0.2s;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+        }
+
+        .card-content h3 {
+            color: #ffffff;
+            font-size: 1.4em;
+            margin-bottom: 8px;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .card-content p {
+            color: #b0b0b0;
+            font-size: 0.9em;
+            margin: 0;
+        }
+
+        .card-button {
+            padding: 12px 30px;
+            background: #1f1f1f;
+            border: 1px solid #ffffff;
+            border-radius: 12px;
+            color: #ffffff;
+            font-size: 1em;
+            font-weight: 700;
+            text-transform: uppercase;
+            cursor: pointer;
+            margin-top: 12px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .card-button svg {
+            width: 18px;
+            height: 18px;
+            fill: #ffffff;
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .card-button:hover {
+            transform: scale(1.05);
+        }
+
+        .card-button:hover svg {
+            transform: translateX(4px);
+        }
+
+        .card-button:before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(120deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            transition: left 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .card-button:hover:before {
+            left: 100%;
+        }
+
+        .init-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(10, 10, 10, 0.95);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: #ffffff;
+            z-index: 1000;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .init-overlay.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .init-overlay h2 {
+            font-size: 2em;
+            margin-bottom: 20px;
+            animation: pulse 1.5s infinite cubic-bezier(0.4, 0, 0.2, 1);
+            text-transform: uppercase;
+        }
+
+        .init-overlay .progress-bar {
+            width: 200px;
+            height: 3px;
+            background: #333333;
+            overflow: hidden;
+        }
+
+        .init-overlay .progress-bar div {
+            width: 0;
+            height: 100%;
+            background: #ffffff;
+            transition: width 2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .init-overlay.active .progress-bar div {
+            width: 100%;
+        }
+
+        .pagination {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin: 20px 0;
+        }
+
+        .pagination button {
+            padding: 10px 20px;
+            background: #1f1f1f;
+            border: 1px solid #ffffff;
+            border-radius: 12px;
+            color: #ffffff;
+            font-size: 1em;
+            font-weight: 700;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .pagination button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .pagination button:hover:not(:disabled) {
+            transform: scale(1.05);
+        }
+
+        .pagination button:before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(120deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            transition: left 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .pagination button:hover:not(:disabled):before {
+            left: 100%;
+        }
+
+        @keyframes slideInRight {
+            from { transform: translateX(50px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideInUp {
+            from { transform: translateY(30px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        @keyframes slideUpFade {
+            from { transform: translateY(20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.03); }
+        }
+
+        .scroll-reveal {
+            opacity: 0;
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .scroll-reveal.visible {
+            opacity: 1;
+            animation: slideUpFade 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        @media (max-width: 768px) {
+            p { font-size: 0.9em; }
+            .card-grid { grid-template-columns: 1fr; }
+            .card-button, a button { padding: 10px 20px; font-size: 0.9em; }
+            .tag-filter { padding: 8px 16px; font-size: 0.8em; }
+        }
+
+        @media (min-width: 768px) and (max-width: 1024px) {
+            .card-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+    </style>
+</head>
+<body>
+    <div class="stars"></div>
+    <a href="index.html"><button>Home</button></a>
+    <p>If the game page goes blank just click previous or next im still tryna work out that bug - jimbob</p>
+
+    <div class="tag-filters scroll-reveal">
+        <button class="tag-filter active" data-tag="all">All</button>
+        <button class="tag-filter" data-tag="iPad">Works on iPad</button>
+        <button class="tag-filter" data-tag="Desktop">Multiplayer</button>
+        <button class="tag-filter" data-tag="Emulator">Emulator</button>
+        <button class="tag-filter" data-tag="Puzzle">Puzzle</button>
+        <button class="tag-filter" data-tag="Action">Action</button>
+    </div>
+
+    <div class="card-grid" id="card-grid"></div>
+
+    <div class="pagination">
+        <button id="prev-page">Prev</button>
+        <button id="next-page">Next</button>
+    </div>
+
+    <div class="init-overlay">
+        <h2>Launching Sequence...</h2>
+        <div class="progress-bar"><div></div></div>
+    </div>
+
+    <script>
+        // Game Data Array (includes local and hosted games, sorted alphabetically)
+        const games = [
+            { title: "1v1lol", description: "Competitive shooter game", tags: ["Desktop", "Multiplayer"], href: "games/1v1lol" },
+            { title: "10-minutes-till-dawn", description: "Survival shooter", tags: ["Desktop", "Action"], href: "https://hfmanor.com/10-minutes-till-dawn" },
+            { title: "2048", description: "Classic number puzzle", tags: ["iPad", "Puzzle"], href: "games/2048" },
+            { title: "3d-moto-simulator", description: "Motorbike racing", tags: ["Desktop", "Action"], href: "https://hfmanor.com/3d-moto-simulator" },
+            { title: "a-dark-room", description: "Text-based adventure", tags: ["Desktop"], href: "https://hfmanor.com/a-dark-room" },
+            { title: "adarkroom", description: "Text-based adventure", tags: ["Desktop"], href: "games/adarkroom" },
+            { title: "among-us", description: "Social deduction game", tags: ["Desktop", "Multiplayer"], href: "https://hfmanor.com/among-us" },
+            { title: "aquapark-slides", description: "Water slide racing", tags: ["Desktop", "Action"], href: "https://hfmanor.com/aquapark-slides" },
+            { title: "ascispace", description: "Space exploration", tags: ["Desktop"], href: "games/asciispace" },
+            { title: "assessmentexamination", description: "Trivia challenge", tags: ["iPad"], href: "games/assessmentexamination" },
+            { title: "asteroids", description: "Classic arcade shooter", tags: ["Desktop", "Action"], href: "games/asteroids" },
+            { title: "astray", description: "Maze exploration", tags: ["Desktop"], href: "games/astray" },
+            { title: "b-cubed", description: "3D cube puzzle", tags: ["iPad", "Puzzle"], href: "https://hfmanor.com/b-cubed" },
+            { title: "backcountry", description: "Racing adventure", tags: ["Desktop", "Action"], href: "games/backcountry" },
+            { title: "bad-ice cream", description: "Maze runner", tags: ["Desktop", "Action"], href: "https://hfmanor.com/bad-ice cream" },
+            { title: "baldbasics", description: "Educational horror game", tags: ["Desktop"], href: "games/baldisbasics" },
+            { title: "basketballlegends", description: "Basketball multiplayer", tags: ["Desktop", "Multiplayer"], href: "games/basketballlegends" },
+            { title: "basketballstars", description: "Basketball challenge", tags: ["Desktop", "Multiplayer"], href: "games/basketballstars" },
+            { title: "basketbrosio", description: "Casual basketball", tags: ["Desktop", "Multiplayer"], href: "games/basketbrosio" },
+            { title: "basketbandom", description: "Random basketball match", tags: ["Desktop", "Multiplayer"], href: "games/basketbandom" },
+            { title: "big-tower-tiny-square", description: "Platformer challenge", tags: ["Desktop", "Action"], href: "https://hfmanor.com/big-tower-tiny-square" },
+            { title: "bitlife", description: "Life simulation", tags: ["iPad"], href: "games/bitlife" },
+            { title: "blackholesquare", description: "Puzzle adventure", tags: ["iPad", "Puzzle"], href: "games/blackholesquare" },
+            { title: "bloons-td-1", description: "Tower defense", tags: ["Desktop", "Emulator"], href: "https://hfmanor.com/bloons-td-1" },
+            { title: "bloons-td-2", description: "Tower defense sequel", tags: ["Desktop", "Emulator"], href: "https://hfmanor.com/bloons-td-2" },
+            { title: "bloons-td-3", description: "Tower defense sequel", tags: ["Desktop", "Emulator"], href: "https://hfmanor.com/bloons-td-3" },
+            { title: "bloxorz", description: "Block puzzle", tags: ["iPad", "Puzzle"], href: "https://hfmanor.com/bloxorz" },
+            { title: "bounceback", description: "Reflex game", tags: ["Desktop", "Action"], href: "games/bounceback" },
+            { title: "boxingrandom", description: "Boxing challenge", tags: ["Desktop", "Multiplayer"], href: "games/boxingrandom" },
+            { title: "breakout", description: "Classic brick breaker", tags: ["Desktop", "Action"], href: "games/breakout" },
+            { title: "btd4", description: "Tower defense", tags: ["Desktop", "Emulator"], href: "games/btd4" },
+            { title: "candy-box-2", description: "Text-based adventure", tags: ["Desktop"], href: "https://hfmanor.com/candy-box-2" },
+            { title: "captaincallisto", description: "Space adventure", tags: ["Desktop"], href: "games/captaincallisto" },
+            { title: "cat-mario", description: "Tricky platformer", tags: ["Desktop", "Action"], href: "https://hfmanor.com/cat-mario" },
+            { title: "cat-ninja", description: "Ninja platformer", tags: ["Desktop", "Action"], href: "https://hfmanor.com/cat-ninja" },
+            { title: "chess", description: "Classic strategy game", tags: ["iPad", "Puzzle"], href: "games/chess" },
+            { title: "chromaincident", description: "Dino runner", tags: ["Desktop", "Action"], href: "games/chromaincident" },
+            { title: "chromedino", description: "Dino runner", tags: ["Desktop", "Action"], href: "games/chromedino" },
+            { title: "clickerheroes", description: "Idle clicker", tags: ["iPad"], href: "games/clickerheroes" },
+            { title: "clusterush", description: "Chaotic racing", tags: ["Desktop", "Action"], href: "games/clusterush" },
+            { title: "connect3", description: "Match three puzzle", tags: ["iPad", "Puzzle"], href: "games/connect3" },
+            { title: "cookieclicker", description: "Idle baking game", tags: ["iPad"], href: "games/cookieclicker" },
+            { title: "cool-math-games", description: "Educational puzzles", tags: ["iPad", "Puzzle"], href: "https://hfmanor.com/cool-math-games" },
+            { title: "crossyroad", description: "Endless runner", tags: ["iPad", "Action"], href: "games/crossyroad" },
+            { title: "csgoclicker", description: "Shooter clicker", tags: ["Desktop"], href: "games/csgoclicker" },
+            { title: "cubefield", description: "Avoidance game", tags: ["Desktop", "Action"], href: "games/cubefield" },
+            { title: "cutthemanythem", description: "Rope cutting puzzle", tags: ["iPad", "Puzzle"], href: "games/cutthemanythem" },
+            { title: "cuttherope", description: "Rope cutting puzzle", tags: ["iPad", "Puzzle"], href: "games/cuttherope" },
+            { title: "cuttheropeholiday", description: "Holiday rope cutting", tags: ["iPad", "Puzzle"], href: "games/cuttheropeholiday" },
+            { title: "cuttheropetimetravel", description: "Time travel rope cutting", tags: ["iPad", "Puzzle"], href: "games/cuttheropetimetravel" },
+            { title: "deathrun3d", description: "Obstacle runner", tags: ["Desktop", "Action"], href: "games/deathrun3d" },
+            { title: "deepestsword", description: "Puzzle adventure", tags: ["Desktop", "Puzzle"], href: "games/deepestsword" },
+            { title: "dino-game", description: "Dino runner", tags: ["Desktop", "Action"], href: "https://hfmanor.com/dino-game" },
+            { title: "doodlejump", description: "Endless jumper", tags: ["iPad", "Action"], href: "games/doodlejump" },
+            { title: "doom", description: "Classic shooter", tags: ["Desktop", "Emulator", "Action"], href: "games/doom" },
+            { title: "drawthehill", description: "Drawing challenge", tags: ["iPad"], href: "games/drawthehill" },
+            { title: "drift", description: "Car drifting", tags: ["Desktop", "Action"], href: "games/drift" },
+            { title: "drifthunters", description: "Car drifting", tags: ["Desktop", "Action"], href: "games/drifthunters" },
+            { title: "drivemad", description: "Driving challenge", tags: ["Desktop", "Action"], href: "games/drivemad" },
+            { title: "ducklife", description: "Duck training sim", tags: ["iPad"], href: "games/ducklife" },
+            { title: "ducklife2", description: "Duck training sim", tags: ["iPad"], href: "games/ducklife2" },
+            { title: "ducklife3", description: "Duck training sim", tags: ["iPad"], href: "games/ducklife3" },
+            { title: "ducklife4", description: "Duck training sim", tags: ["iPad"], href: "games/ducklife4" },
+            { title: "ducklife5", description: "Duck training sim", tags: ["iPad"], href: "games/ducklife5" },
+            { title: "earntodie", description: "Zombie driving", tags: ["Desktop", "Action"], href: "games/earntodie" },
+            { title: "edgenotfound", description: "Puzzle adventure", tags: ["Desktop", "Puzzle"], href: "games/edgenotfound" },
+            { title: "eggycar", description: "Physics driving", tags: ["Desktop", "Action"], href: "games/eggycar" },
+            { title: "evilglitch", description: "Glitchy shooter", tags: ["Desktop", "Action"], href: "games/evilglitch" },
+            { title: "factoryballsforever", description: "Puzzle crafting", tags: ["iPad", "Puzzle"], href: "games/factoryballsforever" },
+            { title: "fireboy-and-watergirl-2", description: "Co-op puzzle sequel", tags: ["Desktop", "Multiplayer", "Puzzle"], href: "https://hfmanor.com/fireboy-and-watergirl-2" },
+            { title: "fireboy-and-watergirl-3", description: "Co-op puzzle sequel", tags: ["Desktop", "Multiplayer", "Puzzle"], href: "https://hfmanor.com/fireboy-and-watergirl-3" },
+            { title: "fireboy-and-watergirl-4", description: "Co-op puzzle sequel", tags: ["Desktop", "Multiplayer", "Puzzle"], href: "https://hfmanor.com/fireboy-and-watergirl-4" },
+            { title: "fireboy-and-watergirl-5", description: "Co-op puzzle sequel", tags: ["Desktop", "Multiplayer", "Puzzle"], href: "https://hfmanor.com/fireboy-and-watergirl-5" },
+            { title: "fireboyandwatergirlforesttemple", description: "Co-op puzzle", tags: ["Desktop", "Multiplayer", "Puzzle"], href: "games/fireboyandwatergirlforesttemple" },
+            { title: "flappy2048", description: "Flappy puzzle", tags: ["iPad", "Puzzle"], href: "games/flappy2048" },
+            { title: "flappybird", description: "Classic flappy game", tags: ["iPad", "Action"], href: "games/flappybird" },
+            { title: "flappyplane", description: "Flappy challenge", tags: ["iPad", "Action"], href: "games/flappyplane" },
+            { title: "flightsimulator", description: "Flight sim", tags: ["Desktop"], href: "games/flightsimulator" },
+            { title: "fridaynightfunkin", description: "Rhythm game", tags: ["Desktop", "Action"], href: "games/fridaynightfunkin" },
+            { title: "friendlyfire", description: "Shooter game", tags: ["Desktop", "Action"], href: "games/friendlyfire" },
+            { title: "fruitninja", description: "Fruit slicing", tags: ["iPad", "Action"], href: "games/fruitninja" },
+            { title: "geometrydash", description: "Platformer challenge", tags: ["Desktop", "Action"], href: "games/geometrydash" },
+            { title: "getawayshootoutnew", description: "Shooter race", tags: ["Desktop", "Multiplayer", "Action"], href: "games/getawayshootoutnew" },
+            { title: "gladihoppers", description: "Gladiator battle", tags: ["Desktop", "Action"], href: "games/gladihoppers" },
+            { title: "go-kart-go-ultra", description: "Kart racing", tags: ["Desktop", "Action"], href: "https://hfmanor.com/go-kart-go-ultra" },
+            { title: "googlesnake", description: "Classic snake game", tags: ["iPad"], href: "games/googlesnake" },
+            { title: "gopherkart", description: "Racing game", tags: ["Desktop", "Action"], href: "games/gopherkart" },
+            { title: "grindcraft", description: "Crafting sim", tags: ["iPad"], href: "games/grindcraft" },
+            { title: "happy-wheels", description: "Physics-based racing", tags: ["Desktop", "Action"], href: "https://hfmanor.com/happy-wheels" },
+            { title: "hexgl", description: "Futuristic racing", tags: ["Desktop", "Action"], href: "games/hexgl" },
+            { title: "hextris", description: "Hexagon puzzle", tags: ["iPad", "Puzzle"], href: "games/hextris" },
+            { title: "highwaytraffic", description: "Traffic dodging", tags: ["Desktop", "Action"], href: "games/highwaytraffic" },
+            { title: "idle-breakout", description: "Idle brick breaker", tags: ["iPad"], href: "https://hfmanor.com/idle-breakout" },
+            { title: "idle-dice", description: "Dice rolling sim", tags: ["iPad"], href: "https://hfmanor.com/idle-dice" },
+            { title: "impossible-tic-tac-toe", description: "Challenging tic-tac-toe", tags: ["iPad", "Puzzle"], href: "https://hfmanor.com/impossible-tic-tac-toe" },
+            { title: "jet-rush", description: "Jet runner", tags: ["Desktop", "Action"], href: "https://hfmanor.com/jet-rush" },
+            { title: "konnekt", description: "Puzzle connection", tags: ["iPad", "Puzzle"], href: "games/konnekt" },
+            { title: "learntofly", description: "Flight challenge", tags: ["Desktop"], href: "games/learntofly" },
+            { title: "letsurf", description: "Surfing challenge", tags: ["Desktop", "Action"], href: "games/letsurf" },
+            { title: "littlealchemy", description: "Element crafting", tags: ["iPad"], href: "games/littlealchemy" },
+            { title: "madalin-stunt-cars-2", description: "Stunt driving", tags: ["Desktop", "Action"], href: "https://hfmanor.com/madalin-stunt-cars-2" },
+            { title: "madalin-stunt-cars-3", description: "Stunt driving sequel", tags: ["Desktop", "Action"], href: "https://hfmanor.com/madalin-stunt-cars-3" },
+            { title: "mario-kart", description: "Classic kart racing", tags: ["Desktop", "Emulator", "Action"], href: "https://hfmanor.com/mario-kart" },
+            { title: "merge-cyber-racers", description: "Car merging race", tags: ["Desktop", "Action"], href: "https://hfmanor.com/merge-cyber-racers" },
+            { title: "mergeroundracers", description: "Racing merge game", tags: ["Desktop", "Action"], href: "games/mergeroundracers" },
+            { title: "minecraft", description: "Sandbox building", tags: ["Desktop", "Emulator"], href: "https://hfmanor.com/minecraft" },
+            { title: "monkeymart", description: "Monkey shop sim", tags: ["Desktop", "iPad"], href: "games/monkeymart" },
+            { title: "monster-tracks", description: "Monster truck racing", tags: ["Desktop", "Action"], href: "https://hfmanor.com/monster-tracks" },
+            { title: "motoroadrash3d", description: "Bike racing", tags: ["Desktop", "Action"], href: "games/motoroadrash3d" },
+            { title: "motox3m", description: "Motorbike stunts", tags: ["Desktop", "Action"], href: "games/motox3m" },
+            { title: "motox3m-2", description: "Motorbike stunts sequel", tags: ["Desktop", "Action"], href: "https://hfmanor.com/motox3m-2" },
+            { title: "motox3m-pool-party", description: "Motorbike stunts party", tags: ["Desktop", "Action"], href: "https://hfmanor.com/motox3m-pool-party" },
+            { title: "motox3m-spooky-land", description: "Motorbike stunts spooky", tags: ["Desktop", "Action"], href: "https://hfmanor.com/motox3m-spooky-land" },
+            { title: "motox3m-winter", description: "Motorbike stunts winter", tags: ["Desktop", "Action"], href: "https://hfmanor.com/motox3m-winter" },
+            { title: "ninjasevilcorp", description: "Ninja action", tags: ["Desktop", "Action"], href: "games/ninjasevilcorp" },
+            { title: "omnomBounce", description: "Bouncing challenge", tags: ["iPad", "Action"], href: "games/omnomBounce" },
+            { title: "ovo", description: "Platformer", tags: ["Desktop", "Action"], href: "games/ovo" },
+            { title: "ovo2", description: "Platformer sequel", tags: ["Desktop", "Action"], href: "games/ovo2" },
+            { title: "packabunchas", description: "Packing puzzle", tags: ["iPad", "Puzzle"], href: "games/packabunchas" },
+            { title: "pacman", description: "Classic arcade", tags: ["iPad", "Action"], href: "games/pacman" },
+            { title: "paper-minecraft", description: "2D sandbox building", tags: ["Desktop", "Emulator"], href: "https://hfmanor.com/paper-minecraft" },
+            { title: "paperio", description: "Territory capture", tags: ["Desktop", "Multiplayer"], href: "games/paperio" },
+            { title: "particleclicker", description: "Science clicker", tags: ["iPad"], href: "games/particleclicker" },
+            { title: "pokemon-emerald", description: "Classic Pokémon adventure", tags: ["Desktop", "Emulator"], href: "https://hfmanor.com/pokemon-emerald" },
+            { title: "pokemon-fire-red", description: "Classic Pokémon adventure", tags: ["Desktop", "Emulator"], href: "https://hfmanor.com/pokemon-fire-red" },
+            { title: "pokemon-leaf-green", description: "Classic Pokémon adventure", tags: ["Desktop", "Emulator"], href: "https://hfmanor.com/pokemon-leaf-green" },
+            { title: "pokemon-ruby", description: "Classic Pokémon adventure", tags: ["Desktop", "Emulator"], href: "https://hfmanor.com/pokemon-ruby" },
+            { title: "pokemon-sapphire", description: "Classic Pokémon adventure", tags: ["Desktop", "Emulator"], href: "https://hfmanor.com/pokemon-sapphire" },
+            { title: "pushback", description: "Physics puzzle", tags: ["Desktop", "Puzzle"], href: "games/pushback" },
+            { title: "q1k3", description: "Shooter challenge", tags: ["Desktop", "Action"], href: "games/q1k3" },
+            { title: "r3", description: "Racing game", tags: ["Desktop", "Action"], href: "games/r3" },
+            { title: "racer", description: "Racing challenge", tags: ["Desktop", "Action"], href: "games/racer" },
+            { title: "radiusraid", description: "Space shooter", tags: ["Desktop", "Action"], href: "games/radiusraid" },
+            { title: "redball4", description: "Platformer", tags: ["Desktop", "Action"], href: "games/redball4" },
+            { title: "retroBowl", description: "Football sim", tags: ["Desktop"], href: "games/retroBowl" },
+            { title: "retrohaunt", description: "Retro horror", tags: ["Desktop"], href: "games/retrohaunt" },
+            { title: "riddleschool2", description: "Escape puzzle", tags: ["Desktop", "Puzzle"], href: "games/riddleschool2" },
+            { title: "ritz", description: "Platformer", tags: ["Desktop", "Action"], href: "games/ritz" },
+            { title: "roadblocks", description: "Obstacle runner", tags: ["Desktop", "Action"], href: "games/roadblocks" },
+            { title: "rooftopsnipers", description: "Sniper duel", tags: ["Desktop", "Multiplayer", "Action"], href: "games/rooftopsnipers" },
+            { title: "run", description: "Endless runner", tags: ["Desktop", "Action"], href: "https://hfmanor.com/run" },
+            { title: "run2", description: "Endless runner sequel", tags: ["Desktop", "Action"], href: "https://hfmanor.com/run2" },
+            { title: "run3", description: "Endless runner", tags: ["Desktop", "Action"], href: "games/run3" },
+            { title: "scrapmetal3", description: "Car destruction", tags: ["Desktop", "Action"], href: "games/scrapmetal3" },
+            { title: "shuttledeck", description: "Card game", tags: ["iPad"], href: "games/shuttledeck" },
+            { title: "sketchbook04", description: "Drawing challenge", tags: ["iPad"], href: "games/sketchbook04" },
+            { title: "sleepingbeauty", description: "Puzzle adventure", tags: ["Desktop", "Puzzle"], href: "games/sleepingbeauty" },
+            { title: "slitherio", description: "Snake multiplayer", tags: ["Desktop", "Multiplayer"], href: "games/slitherio" },
+            { title: "slope", description: "Ball runner", tags: ["Desktop", "Action"], href: "games/slope" },
+            { title: "slope2", description: "Ball runner sequel", tags: ["Desktop", "Action"], href: "games/slope2" },
+            { title: "smash-karts", description: "Kart battle racing", tags: ["Desktop", "Multiplayer", "Action"], href: "https://hfmanor.com/smash-karts" },
+            { title: "snake", description: "Classic snake", tags: ["iPad"], href: "games/snake" },
+            { title: "snow-battle-io", description: "Snowball fight", tags: ["Desktop", "Multiplayer", "Action"], href: "https://hfmanor.com/snow-battle-io" },
+            { title: "snow-rider-3d", description: "Snowboarding challenge", tags: ["Desktop", "Action"], href: "https://hfmanor.com/snow-rider-3d" },
+            { title: "snowbattle", description: "Snowball fight", tags: ["Desktop", "Multiplayer", "Action"], href: "games/snowbattle" },
+            { title: "soccerrandom", description: "Random soccer match", tags: ["Desktop", "Multiplayer"], href: "games/soccerrandom" },
+            { title: "solitaire", description: "Classic card game", tags: ["iPad"], href: "games/solitaire" },
+            { title: "spacecompany", description: "Space sim", tags: ["Desktop"], href: "games/spacecompany" },
+            { title: "spacehuggers", description: "Space shooter", tags: ["Desktop", "Action"], href: "games/spacehuggers" },
+            { title: "spaceinvaders", description: "Classic arcade", tags: ["Desktop", "Action"], href: "games/spaceinvaders" },
+            { title: "stack", description: "Stacking challenge", tags: ["iPad"], href: "games/stack" },
+            { title: "stackball", description: "Ball breaker", tags: ["Desktop", "Action"], href: "games/stackball" },
+            { title: "stickmanboost", description: "Stickman platformer", tags: ["Desktop", "Action"], href: "games/stickmanboost" },
+            { title: "stickmanclimb", description: "Stickman climbing", tags: ["Desktop", "Action"], href: "games/stickmanclimb" },
+            { title: "stickmangolf", description: "Stickman golf", tags: ["Desktop"], href: "games/stickmangolf" },
+            { title: "stickmanhook", description: "Stickman swinging", tags: ["Desktop", "Action"], href: "games/stickmanhook" },
+            { title: "stickmansurvival", description: "Stickman survival", tags: ["Desktop", "Action"], href: "games/stickmansurvival" },
+            { title: "subwaysurfers", description: "Endless runner", tags: ["Desktop", "Action"], href: "games/subwaysurfers" },
+            { title: "subwaysurfersny", description: "NY themed runner", tags: ["Desktop", "Action"], href: "games/subwaysurfersny" },
+            { title: "subwaysurferssingapore", description: "Singapore themed runner", tags: ["Desktop", "Action"], href: "games/subwaysurferssingapore" },
+            { title: "super-hot", description: "Time-bending shooter", tags: ["Desktop", "Action"], href: "https://hfmanor.com/super-hot" },
+            { title: "super-mario-64", description: "Classic platformer", tags: ["Desktop", "Emulator", "Action"], href: "https://hfmanor.com/super-mario-64" },
+            { title: "super-mario-bros", description: "Classic platformer", tags: ["Desktop", "Emulator", "Action"], href: "https://hfmanor.com/super-mario-bros" },
+            { title: "tanukisunset", description: "Skateboarding adventure", tags: ["Desktop", "Action"], href: "games/tanukisunset" },
+            { title: "tetris", description: "Classic puzzle", tags: ["iPad", "Puzzle"], href: "games/tetris" },
+            { title: "themazeofspacegoblins", description: "Maze adventure", tags: ["Desktop", "Puzzle"], href: "games/themazeofspacegoblins" },
+            { title: "theshooter", description: "Shooting game", tags: ["Desktop", "Action"], href: "games/theshooter" },
+            { title: "theshooter2", description: "Shooting sequel", tags: ["Desktop", "Action"], href: "games/theshooter2" },
+            { title: "theshooter3", description: "Shooting sequel", tags: ["Desktop", "Action"], href: "games/theshooter3" },
+            { title: "tinyfishing", description: "Fishing sim", tags: ["iPad"], href: "games/tinyfishing" },
+            { title: "tombofthmask", description: "Tomb exploration", tags: ["Desktop", "Action"], href: "games/tombofthmask" },
+            { title: "topspeedracing3d", description: "3D racing", tags: ["Desktop", "Action"], href: "games/topspeedracing3d" },
+            { title: "towermaster", description: "Tower building", tags: ["iPad"], href: "games/towermaster" },
+            { title: "trimps", description: "Idle strategy", tags: ["Desktop"], href: "games/trimps" },
+            { title: "tunnelrush", description: "Tunnel runner", tags: ["Desktop", "Action"], href: "games/tunnelrush" },
+            { title: "vex3", description: "Platformer challenge", tags: ["Desktop", "Action"], href: "games/vex3" },
+            { title: "vex4", description: "Platformer challenge", tags: ["Desktop", "Action"], href: "games/vex4" },
+            { title: "vex5", description: "Platformer challenge", tags: ["Desktop", "Action"], href: "games/vex5" },
+            { title: "vex6", description: "Platformer challenge", tags: ["Desktop", "Action"], href: "games/vex6" },
+            { title: "webecomewehatwebehold", description: "Narrative game", tags: ["Desktop"], href: "games/webecomewhatwebehold" },
+            { title: "worldshardestgame2", description: "Challenging maze", tags: ["Desktop", "Puzzle"], href: "games/worldshardestgame2" },
+            { title: "worldshardestgame2Exe", description: "Challenging maze", tags: ["Desktop", "Puzzle"], href: "games/worldshardestgame2Exe" },
+            { title: "wordle", description: "Word puzzle", tags: ["iPad", "Puzzle"], href: "games/wordle" }
+        ];
+
+        // Pagination and Filter State
+        const gamesPerPage = 12;
+        let currentPage = 1;
+        let filteredGames = [...games];
+        let currentTag = "all";
+
+        // DOM Elements
+        const cardGrid = document.getElementById("card-grid");
+        const prevPageBtn = document.getElementById("prev-page");
+        const nextPageBtn = document.getElementById("next-page");
+        const initOverlay = document.querySelector(".init-overlay");
+        const tagFilters = document.querySelectorAll(".tag-filter");
+
+        // Render Games to the Grid
+        function renderGames() {
+            const start = (currentPage - 1) * gamesPerPage;
+            const end = start + gamesPerPage;
+            const gamesToShow = filteredGames.slice(start, end);
+
+            // Clear the grid
+            cardGrid.innerHTML = "";
+
+            // Create game cards
+            gamesToShow.forEach((game, index) => {
+                const card = document.createElement("div");
+                card.className = "card scroll-reveal";
+                card.dataset.tags = game.tags.join(" ");
+                card.style.animationDelay = `${index % 2 === 0 ? 0.1 : 0.2}s`;
+                card.innerHTML = `
+                    <div class="card-content">
+                        <h3>${game.title}</h3>
+                        <p>${game.description} | Tags: ${game.tags.join(", ")}</p>
+                        <button class="card-button" data-href="${game.href}">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                        </button>
+                    </div>
+                `;
+                cardGrid.appendChild(card);
+            });
+
+            // Update pagination buttons
+            prevPageBtn.disabled = currentPage === 1;
+            nextPageBtn.disabled = end >= filteredGames.length;
+
+            // Add click events to game buttons with error handling
+            document.querySelectorAll(".card-button").forEach(button => {
+                button.addEventListener("click", (e) => {
+                    e.preventDefault();
+                    const href = button.dataset.href;
+                    console.log("Attempting to load:", href); // Debug log
+
+                    // Show loading overlay
+                    initOverlay.classList.add("active");
+
+                    // Check if the game URL exists
+                    fetch(href, { method: "HEAD" })
+                        .then(response => {
+                            if (response.ok) {
+                                // Navigate after 2 seconds
+                                setTimeout(() => {
+                                    window.location.href = href;
+                                    console.log("Navigating to:", href);
+                                }, 2000);
+                            } else {
+                                console.error("Game not found:", href);
+                                initOverlay.classList.remove("active");
+                                alert(`Error: Could not find game at "${href}". Please check the file path.`);
+                            }
+                        })
+                        .catch(error => {
+                            console.error("Fetch error:", error);
+                            initOverlay.classList.remove("active");
+                            alert("Error loading game: " + error.message);
+                        });
+                });
+            });
+
+            // Force reveal of cards after rendering
+            revealOnScroll();
+        }
+
+        // Filter Games by Tag
+        tagFilters.forEach(filter => {
+            filter.addEventListener("click", () => {
+                currentTag = filter.dataset.tag;
+                currentPage = 1;
+
+                // Update active filter
+                tagFilters.forEach(f => f.classList.remove("active"));
+                filter.classList.add("active");
+
+                // Filter games
+                filteredGames = currentTag === "all"
+                    ? [...games]
+                    : games.filter(game => game.tags.includes(currentTag));
+
+                renderGames();
+            });
+        });
+
+        // Pagination Controls
+        prevPageBtn.addEventListener("click", () => {
+            if (currentPage > 1) {
+                currentPage--;
+                renderGames();
+                window.scrollTo({ top: 0, behavior: "smooth" });
+            }
+        });
+
+        nextPageBtn.addEventListener("click", () => {
+            if (currentPage * gamesPerPage < filteredGames.length) {
+                currentPage++;
+                renderGames();
+                window.scrollTo({ top: 0, behavior: "smooth" });
+            }
+        });
+
+        // Shooting Stars Effect
+        const starsContainer = document.querySelector(".stars");
+        function createStar() {
+            const star = document.createElement("div");
+            star.className = "star";
+            const x = Math.random() * 100;
+            const duration = Math.random() * 2 + 1;
+            star.style.left = `${x}%`;
+            star.style.top = `${Math.random() * 100}%`;
+            star.style.animation = `shoot ${duration}s linear infinite`;
+            starsContainer.appendChild(star);
+            setTimeout(() => star.remove(), duration * 1000);
+        }
+
+        // Add shooting star animation
+        const styleSheet = document.styleSheets[0];
+        styleSheet.insertRule(`
+            @keyframes shoot {
+                0% { transform: translateX(0) translateY(0); opacity: 1; }
+                100% { transform: translateX(-100vw) translateY(100vh); opacity: 0; }
+            }
+        `, styleSheet.cssRules.length);
+        setInterval(createStar, 200);
+
+        // Scroll Reveal Effect
+        const scrollReveals = document.querySelectorAll(".scroll-reveal");
+        function revealOnScroll() {
+            const windowHeight = window.innerHeight;
+            scrollReveals.forEach(element => {
+                const elementTop = element.getBoundingClientRect().top;
+                if (elementTop < windowHeight - 100) {
+                    element.classList.add("visible");
+                }
+            });
+        }
+
+        // Initial Load with Fallback
+        window.addEventListener("scroll", revealOnScroll);
+        window.addEventListener("load", () => {
+            console.log("Page loaded successfully");
+            renderGames();
+            revealOnScroll();
+
+            // Fallback: Check if the grid is empty after a short delay, and re-render if needed
+            setTimeout(() => {
+                if (cardGrid.children.length === 0) {
+                    console.log("Grid is empty, re-rendering...");
+                    renderGames();
+                }
+            }, 500);
+        });
+
+        // Trigger render immediately after DOM is ready
+        document.addEventListener("DOMContentLoaded", () => {
+            console.log("DOM fully loaded, rendering games...");
+            renderGames();
+        });
+    </script>
+</body>
+</html>

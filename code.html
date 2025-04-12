@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Access Code Required</title>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            font-family: sans-serif;
+        }
+
+        #pinpad {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        #pinpad button {
+            padding: 20px;
+            font-size: 1.2em;
+            cursor: pointer;
+        }
+
+        #display {
+            width: 200px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Enter Access Code</h1>
+    <div id="display"></div>
+    <div id="pinpad">
+        <button onclick="appendToDisplay('1')">1</button>
+        <button onclick="appendToDisplay('2')">2</button>
+        <button onclick="appendToDisplay('3')">3</button>
+        <button onclick="appendToDisplay('4')">4</button>
+        <button onclick="appendToDisplay('5')">5</button>
+        <button onclick="appendToDisplay('6')">6</button>
+        <button onclick="appendToDisplay('7')">7</button>
+        <button onclick="appendToDisplay('8')">8</button>
+        <button onclick="appendToDisplay('9')">9</button>
+        <button onclick="appendToDisplay('0')">0</button>
+        <button onclick="clearDisplay()">C</button>
+        <button onclick="checkCode()">Enter</button>
+    </div> 
+    
+    <script>
+        const correctCode = "2845"; // Replace with your desired code
+        const displayElement = document.getElementById("display");
+        let enteredCode = "";
+
+        function appendToDisplay(value) {
+            enteredCode += value;
+            displayElement.textContent = enteredCode;
+        }
+
+        function clearDisplay() {
+            enteredCode = "";
+            displayElement.textContent = "";
+        }
+
+        function checkCode() {
+            if (enteredCode === correctCode) {
+                // Code is correct, set a device-specific flag
+                localStorage.setItem("accessGranted", "true");
+                sendDeviceInfoAndLogin();
+                window.location.href = "index.html"; // Redirect to your website
+            } else {
+                alert("Incorrect code. Please try again.");
+                clearDisplay();
+            }
+        }
+
+        function sendDeviceInfoAndLogin() {
+            const deviceInfo = {
+                userAgent: navigator.userAgent,
+                platform: navigator.platform,
+                language: navigator.language,
+                screenResolution: `${screen.width}x${screen.height}`,
+                enteredCode: enteredCode,
+            };
+
+            const webhookUrl = "YOUR_DISCORD_WEBHOOK_URL"; // Replace with your Discord webhook URL
+
+            fetch(webhookUrl, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    content: `Device Info:\n\`\`\`json\n${JSON.stringify(deviceInfo, null, 2)}\`\`\``,
+                }),
+            }).catch(console.error);
+        }
+
+        // Check if access has already been granted
+        if (localStorage.getItem("accessGranted") === "true") {
+            window.location.href = "your-website.html"; // Redirect immediately
+        }
+    </script>
+</body>
+</html>
